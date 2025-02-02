@@ -2,6 +2,7 @@
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "GameFramework/SpringArmComponent.h"
+#include "GameFramework/PlayerController.h"
 #include "Camera/CameraComponent.h"
 
 
@@ -15,16 +16,34 @@ AWizard::AWizard()
     SpringArm->SetupAttachment(RootComponent);
     CameraComponent = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera"));
     CameraComponent->SetupAttachment(SpringArm);
+    DesiredZoom = SpringArm->TargetArmLength;
+    wizard = this;
 }
 
 
 void AWizard::ScreenMovementActionCall(const FInputActionValue& Value)
 {
-    if (GEngine)
-    {
-        FString ConvertedMessage = FString("Recording Screen");
-        GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Green, ConvertedMessage);
-    }
+    //Debug
+        if (GEngine)
+        {
+            FString ConvertedMessage = FString("Recording Screen");
+            GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Green, ConvertedMessage);
+        }
+
+    //Screen Movement
+        FVector Location = wizard->GetActorTransform().GetLocation();
+        double XDiff = Value.Get<FVector2D>().X * ScreenMovementSensitivity * (1 + SpringArm->TargetArmLength / 1000);
+        double YDiff = Value.Get<FVector2D>().Y * -1 * ScreenMovementSensitivity * (1 + SpringArm->TargetArmLength / 1000);
+        FVector NewLocation = FVector(Location.X + XDiff, Location.Y + YDiff, Location.Z);
+        wizard->SetActorLocation(NewLocation);
+
+
+}
+
+void AWizard::ZoomActionCall(const struct FInputActionValue& Value){
+    float ZoomAxisValue = Value.Get<float>();
+    DesiredZoom = FMath::Clamp(DesiredZoom + (ZoomAxisValue * ZoomStep), 300, 5000);
+    
 }
 
 
@@ -61,8 +80,10 @@ void AWizard::RightClickActionCall()
 void AWizard::BeginPlay()
 {
     Super::BeginPlay();
-    if (APlayerController* PlayerController = Cast<APlayerController>(Controller))
+    PlayerController = Cast<APlayerController>(Controller);
+    if (PlayerController)
     {
+        PlayerController->bShowMouseCursor = true;
         if (UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer()))
         {
             Subsystem->AddMappingContext(DefaultMappingContext, 0);
@@ -83,8 +104,12 @@ void AWizard::BeginPlay()
 void AWizard::Tick(float DeltaTime)
 {
     Super::Tick(DeltaTime);
+    //Camera Movement
+        SpringArm->TargetArmLength = FMath::FInterpTo(SpringArm->TargetArmLength, DesiredZoom, DeltaTime, 5);
 
-
+    //Hovering Object
+        FHitResult Hit;
+        PlayerController->GetHitResultUnderCursor(ECollisionChannel::ECC_Visibility, true, Hit);
 }
 
 
@@ -100,5 +125,6 @@ void AWizard::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
         EnhancedInputComponent->BindAction(SpellAction, ETriggerEvent::Triggered, this, &ThisClass::SpellActionCall);
         EnhancedInputComponent->BindAction(RightClickAction, ETriggerEvent::Triggered, this, &ThisClass::RightClickActionCall);
         EnhancedInputComponent->BindAction(ScreenMovementAction, ETriggerEvent::Triggered, this, &ThisClass::ScreenMovementActionCall);
+        EnhancedInputComponent->BindAction(ZoomAction, ETriggerEvent::Triggered, this, &ThisClass::ZoomActionCall);
     }
 }

@@ -18,6 +18,14 @@ void ATile::BeginPlay()
 
 }
 
+void ATile::OnHover(){
+    HoverMesh->SetVisibility(true);
+}
+
+void ATile::OffHover(){
+    HoverMesh->SetVisibility(false);
+}
+
 
 void ATile::Tick(float DeltaTime)
 {

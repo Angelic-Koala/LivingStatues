@@ -13,5 +13,15 @@ UCLASS()
 class LIVINGSTATUES_API AWizardController : public APlayerController
 {
 	GENERATED_BODY()
-	
+	public:
+		AWizardController();
+
+	protected:
+		virtual void Tick(float DeltaTime) override;
+		virtual void BeginPlay() override;
+
+	private:
+		FVector CachedDestination;
+		class IHoverableObject* prevActor = nullptr;
+
 };

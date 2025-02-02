@@ -24,6 +24,7 @@ public:
     void ClickActionCall();
     void SpellActionCall();
     void RightClickActionCall();
+    void ZoomActionCall(const struct FInputActionValue& Value);
 
 
 protected:
@@ -33,35 +34,54 @@ protected:
     virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 private:
 
-
-    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
-    class UInputMappingContext* DefaultMappingContext;
-
-
-    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
-    class UInputAction* ScreenMovementAction;
+    //Input
+        UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+        class UInputMappingContext* DefaultMappingContext;
 
 
-    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
-    class UInputAction* ClickAction;
+        UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+        class UInputAction* ScreenMovementAction;
 
 
-    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
-    class UInputAction* SpellAction;
+        UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+        class UInputAction* ZoomAction;
 
 
-    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
-    class UInputAction* RightClickAction;
+        UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+        class UInputAction* ClickAction;
 
 
+        UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+        class UInputAction* SpellAction;
 
 
-    //components
-        // Components
-    UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
-    class USpringArmComponent* SpringArm;
-    UPROPERTY(EditAnywhere, meta = (AllowPrivateAccess = "true"))
-    class UCameraComponent* CameraComponent;
+        UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+        class UInputAction* RightClickAction;
+
+    //Field
+        UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+        float ZoomStep = 30.0f;
+
+        UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+        float DesiredZoom;
+
+        UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+        float ScreenMovementSensitivity = 15.0f;
+
+        UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+        float Health = 150.0f;
+
+
+    //Components
+        AWizard* wizard;
+
+        class APlayerController* PlayerController;
+
+        UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
+        class USpringArmComponent* SpringArm;
+
+        UPROPERTY(EditAnywhere, meta = (AllowPrivateAccess = "true"))
+        class UCameraComponent* CameraComponent;
 
 };
 
